@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "build": "npm install && cd .. && cd frontend && npm install && npm run build && cd .. && cd backend",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
     "prisma:seed": "node prisma/seed.js",

@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
-
+const path = require("path");
 const authRoutes = require("./routes/auth.routes");
 const enquiryRoutes = require("./routes/enquiry.routes");
 const quotationRoutes = require("./routes/quotation.routes");
@@ -24,6 +24,13 @@ app.use("/quotations", quotationRoutes);
 app.use("/sales-orders", salesOrderRoutes);
 app.use("/products", productRoutes);
 
+const frontendPath = path.join(__dirname, "../../frontend/dist");
+app.use(express.static(frontendPath));
+
+// React Router fallback
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
 // Central error handler (catches anything not already handled in controllers)
 app.use((err, req, res, next) => {
   console.error(err);
