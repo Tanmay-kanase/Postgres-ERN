@@ -1,0 +1,36 @@
+const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
+
+const authRoutes = require("./routes/auth.routes");
+const enquiryRoutes = require("./routes/enquiry.routes");
+const quotationRoutes = require("./routes/quotation.routes");
+const salesOrderRoutes = require("./routes/salesOrder.routes");
+const productRoutes = require("./routes/product.routes");
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+if (process.env.NODE_ENV !== "test") {
+  app.use(morgan("dev"));
+}
+
+app.get("/health", (req, res) => res.json({ status: "ok" }));
+
+app.use("/auth", authRoutes);
+app.use("/enquiries", enquiryRoutes);
+app.use("/quotations", quotationRoutes);
+app.use("/sales-orders", salesOrderRoutes);
+app.use("/products", productRoutes);
+
+// Central error handler (catches anything not already handled in controllers)
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: "Internal server error" });
+});
+
+// 404 fallback
+app.use((req, res) => res.status(404).json({ error: "Not found" }));
+
+module.exports = app;

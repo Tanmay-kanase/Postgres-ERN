@@ -1,0 +1,163 @@
+{
+  "info": {
+    "name": "PERN ERP Case Study",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "salesToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "enquiryId", "value": "" },
+    { "key": "quotationId", "value": "" },
+    { "key": "orderId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth - Login (Sales)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"sales@erp.com\",\n  \"password\": \"Sales@123\"\n}" },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Auth - Login (Admin)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@erp.com\",\n  \"password\": \"Admin@123\"\n}" },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "Products - List (with inventory)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{salesToken}}" }],
+        "url": "{{baseUrl}}/products"
+      }
+    },
+    {
+      "name": "Enquiries - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{salesToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customer\": {\n    \"companyName\": \"ABC Engineering Pvt. Ltd.\",\n    \"contactPerson\": \"Rakesh Sharma\",\n    \"mobile\": \"9876543210\",\n    \"email\": \"rakesh@abc.com\",\n    \"city\": \"Pune\"\n  },\n  \"requiredDate\": \"2026-10-01\",\n  \"notes\": \"Urgent requirement\",\n  \"items\": [\n    { \"productId\": 1, \"quantity\": 100 },\n    { \"productId\": 2, \"quantity\": 40 }\n  ]\n}"
+        },
+        "url": "{{baseUrl}}/enquiries"
+      }
+    },
+    {
+      "name": "Enquiries - List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{salesToken}}" }],
+        "url": "{{baseUrl}}/enquiries"
+      }
+    },
+    {
+      "name": "Quotations - Create",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{salesToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"enquiryId\": {{enquiryId}},\n  \"validUntil\": \"2026-10-15\",\n  \"items\": [\n    { \"productId\": 1, \"quantity\": 100, \"unitPrice\": 350, \"discountPct\": 5, \"gstPct\": 18 }\n  ]\n}"
+        },
+        "url": "{{baseUrl}}/quotations"
+      }
+    },
+    {
+      "name": "Quotations - Update Status (SENT)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{salesToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"status\": \"SENT\" }" },
+        "url": "{{baseUrl}}/quotations/{{quotationId}}/status"
+      }
+    },
+    {
+      "name": "Quotations - Update Status (ACCEPTED)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{salesToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"status\": \"ACCEPTED\" }" },
+        "url": "{{baseUrl}}/quotations/{{quotationId}}/status"
+      }
+    },
+    {
+      "name": "Quotations - Convert to Sales Order",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{salesToken}}" }],
+        "url": "{{baseUrl}}/quotations/{{quotationId}}/convert"
+      }
+    },
+    {
+      "name": "Sales Orders - List",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{salesToken}}" }],
+        "url": "{{baseUrl}}/sales-orders"
+      }
+    },
+    {
+      "name": "Sales Orders - Confirm (reserve inventory)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": "{{baseUrl}}/sales-orders/{{orderId}}/confirm"
+      }
+    },
+    {
+      "name": "Sales Orders - Cancel (release inventory)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+        "url": "{{baseUrl}}/sales-orders/{{orderId}}/cancel"
+      }
+    },
+    {
+      "name": "Sales Orders - Dispatch",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"vehicleNumber\": \"MH12AB1234\",\n  \"driverName\": \"Suresh Patil\",\n  \"items\": [\n    { \"productId\": 1, \"quantity\": 100 }\n  ]\n}"
+        },
+        "url": "{{baseUrl}}/sales-orders/{{orderId}}/dispatch"
+      }
+    },
+    {
+      "name": "Products - Adjust Physical Stock (Admin)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"delta\": 50 }" },
+        "url": "{{baseUrl}}/products/1/stock"
+      }
+    }
+  ]
+}
